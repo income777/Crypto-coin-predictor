@@ -1,14 +1,23 @@
-
-from prophet import Prophet
-import pandas as pd
 from data_fetcher import fetch_coin_data
 
 def predict_price(coin_id, horizon_days):
-    df = fetch_coin_data(coin_id)
+    try:
+        df = fetch_coin_data(coin_id)
+    except ValueError as e:
+        return {
+            "error": str(e),
+            "coin_id": coin_id
+        }
 
     df_prophet = df.reset_index().rename(columns={"timestamp": "ds", "price": "y"})
 
-    model = Prophet(daily_seasonality=True)
+    model = Prophet(
+    daily_seasonality=True,
+    weekly_seasonality=True,
+    yearly_seasonality=False,
+    seasonality_mode='multiplicative'  # Better for volatile assets like crypto
+)
+
     model.fit(df_prophet)
 
     future = model.make_future_dataframe(periods=horizon_days, freq='D')
@@ -29,3 +38,4 @@ def predict_price(coin_id, horizon_days):
             for row in chart_data
         ]
     }
+
