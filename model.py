@@ -20,8 +20,11 @@ def predict_price(coin_id, horizon_days):
 
     model.fit(df_prophet)
 
-    future = model.make_future_dataframe(periods=horizon_days, freq='D')
-    forecast = model.predict(future)
+   # Limit future horizon to max 5 days on free tier to avoid timeouts
+max_periods = min(horizon_days, 5)
+
+future = model.make_future_dataframe(periods=max_periods, freq='D')
+forecast = model.predict(future)
 
     predicted_price = forecast.iloc[-1]["yhat"]
     current_price = df["price"].iloc[-1]
