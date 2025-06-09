@@ -1,0 +1,8 @@
+
+fastapi
+uvicorn
+pandas
+requests
+prophet
+scikit-learn
+python-multipart
